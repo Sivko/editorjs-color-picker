@@ -4,6 +4,7 @@
 	"private": false,
 	"main": "dist/index.js",
 	"scripts": {
+		"dev": "vite",
 		"build": "vite build",
 		"format": "prettier --ignore-path .gitignore -w .",
 		"lint": "eslint --ignore-path .gitignore ./**/*.ts"

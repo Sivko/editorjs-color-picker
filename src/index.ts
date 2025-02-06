@@ -33,12 +33,22 @@ export default class ColorPicker implements EditorJS.InlineTool {
 		'#758195',
 		'#1e7afd',
 		'#2998bd',
-		'#23a06b',
-		'#fea363',
-		'#c9372c',
-		'#8270db',
 	];
-	columns = 7;
+
+	backgrounds: string[] = [
+		'#182a4e',
+		'#0055cc',
+		'#1f6a83',
+		'#206e4e',
+		'#e56910',
+		'#ae2e24',
+		'#5e4db2',
+		'#758195',
+		'#1e7afd',
+		'#2998bd',
+	];
+
+	columns = 5;
 
 	static get title() {
 		return 'Color';
@@ -79,7 +89,7 @@ export default class ColorPicker implements EditorJS.InlineTool {
 		this.lastRange = range;
 	}
 
-	wrapAndColor(range: Range | null, color: string) {
+	wrapAndColor(range: Range | null, colorHex: string, isBackground = false) {
 		if (!range) {
 			return;
 		}
@@ -87,7 +97,8 @@ export default class ColorPicker implements EditorJS.InlineTool {
 		const span = document.createElement(this.tag);
 		span.classList.add(this.class);
 		span.appendChild(selectedText);
-		span.style.color = color;
+		if (isBackground) span.style.backgroundColor = colorHex;
+		if (!isBackground) span.style.color = colorHex;
 		span.innerHTML = span.textContent || '';
 		range.insertNode(span);
 
@@ -100,13 +111,27 @@ export default class ColorPicker implements EditorJS.InlineTool {
 		container.style.gridTemplateColumns = `repeat(${this.columns}, 1fr)`;
 
 		this.colors.forEach((colorValue) => {
-			const color = document.createElement('div');
-			color.classList.add('editorjs__color-selector__container-item');
-			color.style.backgroundColor = colorValue;
-			color.onclick = () => {
+			const colorDiv = document.createElement('div');
+			colorDiv.classList.add('editorjs__color-selector__container-item');
+			colorDiv.style.color = colorValue;
+			colorDiv.style.borderColor = colorValue;
+			colorDiv.onclick = (e) => {
+				e.preventDefault();
 				this.wrapAndColor(this.lastRange, colorValue);
 			};
-			container.append(color);
+			container.append(colorDiv);
+		});
+
+		this.backgrounds.forEach((backgroundValue) => {
+			const colorDiv = document.createElement('div');
+			colorDiv.classList.add('editorjs__background-selector__container-item');
+			colorDiv.style.backgroundColor = backgroundValue;
+			colorDiv.style.borderColor = backgroundValue;
+			colorDiv.onclick = (e) => {
+				e.preventDefault();
+				this.wrapAndColor(this.lastRange, backgroundValue, true);
+			};
+			container.append(colorDiv);
 		});
 
 		return container;

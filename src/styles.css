@@ -14,14 +14,39 @@
 }
 
 .editorjs__color-selector__container-item {
-	width: 30px;
-	height: 30px;
+	position: relative;
+	width: 24px;
+	height: 24px;
 	display: block;
 	cursor: pointer;
-	border-radius: 100%;
+	border-radius: 6px;
+	border-style: solid;
+	border-width: 1px;
 	transition: transform 0.2s ease;
 }
 
-.editorjs__color-selector__container-item:hover {
+.editorjs__color-selector__container-item::after{
+	content: "A";
+	position: absolute;
+	font-size: 14px;
+	left: 0;
+	right: 0;
+	text-align: center;
+	top: 5px;
+}
+
+.editorjs__background-selector__container-item {
+	position: relative;
+	width: 24px;
+	height: 24px;
+	display: block;
+	cursor: pointer;
+	border-radius: 6px;
+	border-style: solid;
+	border-width: 1px;
+	transition: transform 0.2s ease;
+}
+
+.editorjs__color-selector__container-item:hover,.editorjs__background-selector__container-item:hover {
 	transform: scale(1.1);
 }
