@@ -1,7 +1,7 @@
 import EditorJS from '@editorjs/editorjs';
 import ColorPicker from './index';
 
-const editor = new EditorJS({
+window.editor = new EditorJS({
   holder: 'editorjs',
   tools: {
     colorPicker: ColorPicker

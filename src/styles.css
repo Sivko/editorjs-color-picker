@@ -1,3 +1,7 @@
+html {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
 .ce-popover--inline .ce-popover--nested .ce-popover__container {
 	width: min-content !important;
 	min-width: unset !important;
@@ -9,32 +13,55 @@
 
 .editorjs__color-selector-container {
 	display: grid;
-	gap: 10px;
-	padding: 4px;
+	gap: 8px;
+	padding: 12px;
+
 }
 
-.editorjs__color-selector__container-item {
-	position: relative;
-	width: 24px;
-	height: 24px;
-	display: block;
-	cursor: pointer;
+.editorjs__colopicker-label {
+	color: #78716C;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 18px;
+	grid-column: 1 / -1;
+}
+
+.editorjs__colopicker-tooltip {
+	position: fixed;
+	/* top: -14px; */
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 12px;
+	background-color: #454241;
+	color: #fff;
 	border-radius: 6px;
-	border-style: solid;
-	border-width: 1px;
-	transition: transform 0.2s ease;
+	/* opacity: 0; */
+	padding: 6px 8px;
+	z-index: 49102491204910249;
+
+	white-space: nowrap;
+	/* left: 50%; */
+	/* transform: translateX(-50%); */
+	/* transition: all 0.2s; */
+	pointer-events: none;
+}
+.editorjs__color-selector__container-item:hover .editorjs__colopicker--selector__container-item__tooltip,
+.editorjs__background-selector__container-item:hover .editorjs__colopicker--selector__container-item__tooltip {
+	opacity: 1;
 }
 
-.editorjs__color-selector__container-item::after{
+
+.editorjs__color-selector__container-item::before {
 	content: "A";
 	position: absolute;
 	font-size: 14px;
 	left: 0;
 	right: 0;
 	text-align: center;
-	top: 5px;
+	top: 4px;
 }
 
+.editorjs__color-selector__container-item,
 .editorjs__background-selector__container-item {
 	position: relative;
 	width: 24px;
@@ -42,11 +69,18 @@
 	display: block;
 	cursor: pointer;
 	border-radius: 6px;
-	border-style: solid;
-	border-width: 1px;
-	transition: transform 0.2s ease;
 }
 
-.editorjs__color-selector__container-item:hover,.editorjs__background-selector__container-item:hover {
-	transform: scale(1.1);
+.editorjs__color-selector__container-item--shadow,
+.editorjs__background-selector__container-item--shadow {
+	position: absolute;
+	inset: 0;
+	box-shadow: 0 0 0 1px inset;
+	border-radius: 6px;
+	transition: all 0.5s ease;
+}
+
+.editorjs__color-selector__container-item--shadow:hover,
+.editorjs__background-selector__container-item--shadow:hover {
+	box-shadow: 0 0 0 2px inset;
 }
