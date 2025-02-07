@@ -1,35 +1,42 @@
 import { API } from '@editorjs/editorjs';
-type ColorPickerConfig = {
-    colors: string[];
-    columns: number;
+type TConfig = {
+    colors: Record<string, string[]>;
+    backgrounds: Record<string, string[]>;
+    icon: string;
 };
-interface ConstructorArgs {
+interface IConstructorArgs {
     api: API;
-    config: ColorPickerConfig;
+    config: TConfig;
 }
 export default class ColorPicker implements EditorJS.InlineTool {
     private api;
     tag: string;
     class: string;
-    defaultColor: string;
     lastRange: Range | null;
-    colors: string[];
+    tooltip: HTMLDivElement | null;
+    icon: string;
     columns: number;
+    colors: Record<string, string[]>;
+    backgrounds: Record<string, string[]>;
     static get title(): string;
     static get isInline(): boolean;
-    constructor(args: ConstructorArgs);
+    constructor({ api, config }: IConstructorArgs);
+    getDefaultColors(): Record<string, string[]>;
+    getDefaultBackgrounds(): Record<string, string[]>;
     render(): HTMLButtonElement;
     surround(range: Range | null): void;
-    wrapAndColor(range: Range | null, color: string): void;
+    wrapAndColor(range: Range | null, colorHex: string, isBackground?: boolean): void;
+    createTooltip(text: string, targetElement: HTMLElement): HTMLDivElement;
+    createLabel(text: string): HTMLDivElement;
+    createPickerSection(label: string, data: Record<string, string[]>, isBackground?: boolean): HTMLDivElement;
     renderActions(): HTMLDivElement;
-    /**
-     * Sanitizer rules
-     *
-     * @returns {object}
-     */
-    static get sanitize(): any;
-}
-export declare class ColorPickerWithoutSanitize extends ColorPicker {
-    static get sanitize(): undefined;
+    clear(): void;
+    static get sanitize(): {
+        span: {
+            style: {
+                color: boolean;
+            };
+        };
+    };
 }
 export {};

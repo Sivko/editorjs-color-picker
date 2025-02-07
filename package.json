@@ -1,5 +1,5 @@
 {
-	"name": "editorjs-color-picker",
+	"name": "@limpopo113/editorjs-color-picker",
 	"version": "1.0.7",
 	"private": false,
 	"main": "dist/index.js",
