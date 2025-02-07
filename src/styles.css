@@ -11,14 +11,13 @@ html {
 	width: max-content;
 }
 
-.editorjs__color-selector-container {
+.editorjs__colorpicker-container {
 	display: grid;
 	gap: 8px;
-	padding: 12px;
-
+	padding: 6px;
 }
 
-.editorjs__colopicker-label {
+.editorjs__colorpicker-label {
 	color: #78716C;
 	font-size: 12px;
 	font-weight: 600;
@@ -26,23 +25,18 @@ html {
 	grid-column: 1 / -1;
 }
 
-.editorjs__colopicker-tooltip {
+.editorjs__colorpicker-tooltip {
 	position: fixed;
-	/* top: -14px; */
 	font-size: 12px;
 	font-weight: 400;
 	line-height: 12px;
 	background-color: #454241;
 	color: #fff;
 	border-radius: 6px;
-	/* opacity: 0; */
 	padding: 6px 8px;
-	z-index: 49102491204910249;
+	z-index: 1000;
 
 	white-space: nowrap;
-	/* left: 50%; */
-	/* transform: translateX(-50%); */
-	/* transition: all 0.2s; */
 	pointer-events: none;
 }
 .editorjs__color-selector__container-item:hover .editorjs__colopicker--selector__container-item__tooltip,
