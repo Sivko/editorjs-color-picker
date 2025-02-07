@@ -2,3 +2,4 @@
 .prettierrc
 tsconfig.json
 vite.config.ts
+yarn.lock
