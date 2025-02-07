@@ -39,6 +39,7 @@ html {
 	white-space: nowrap;
 	pointer-events: none;
 }
+
 .editorjs__color-selector__container-item:hover .editorjs__colopicker--selector__container-item__tooltip,
 .editorjs__background-selector__container-item:hover .editorjs__colopicker--selector__container-item__tooltip {
 	opacity: 1;
@@ -49,10 +50,10 @@ html {
 	content: "A";
 	position: absolute;
 	font-size: 14px;
-	left: 0;
-	right: 0;
-	text-align: center;
-	top: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inset: 0;
 }
 
 .editorjs__color-selector__container-item,

@@ -1,8 +1,9 @@
 {
 	"name": "@limpopo113/editorjs-color-picker",
-	"version": "1.0.7",
+	"version": "1.1.2",
 	"private": false,
-	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+  "types": "./dist/index.d.ts",
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
