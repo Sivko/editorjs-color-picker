@@ -1,6 +1,8 @@
-import { API } from '@editorjs/editorjs';
+import { API, SanitizerConfig } from '@editorjs/editorjs';
 import { IconColor } from '@codexteam/icons';
+import helperFindColorNameByHexOrRGB from "./helpers/helper-find-color";
 import './styles.css';
+import { debug } from "console";
 
 type TConfig = {
   colors: Record<string, string[]>;
@@ -16,7 +18,7 @@ interface IConstructorArgs {
 export default class ColorPicker implements EditorJS.InlineTool {
   private api: API;
   tag = 'SPAN';
-  class = 'cdx-text-color';
+  class = 'cdx-color-picker';
   lastRange: Range | null = null;
   tooltip: HTMLDivElement | null = null;
   icon = IconColor;
@@ -24,6 +26,9 @@ export default class ColorPicker implements EditorJS.InlineTool {
 
   colors: Record<string, string[]>;
   backgrounds: Record<string, string[]>;
+
+  selectedColor: string;
+  selectedBackground: string;
 
   static get title() {
     return 'Color';
@@ -38,6 +43,11 @@ export default class ColorPicker implements EditorJS.InlineTool {
     this.colors = config?.colors ?? this.getDefaultColors();
     this.backgrounds = config?.backgrounds ?? this.getDefaultBackgrounds();
     this.icon = config?.icon ?? IconColor;
+    this.selectedColor = '';
+    this.selectedBackground = '';
+    // this.api.selection.save();
+    this.getState();
+
   }
 
   getDefaultColors(): Record<string, string[]> {
@@ -57,7 +67,7 @@ export default class ColorPicker implements EditorJS.InlineTool {
 
   getDefaultBackgrounds(): Record<string, string[]> {
     return {
-      'Угольный черный': ['#1C1917', '#fff'],
+      'Угольный черный': ['#fff', '#1C1917'],
       'Серебристо-серый': ['#E7E5E4', '#F5F5F4'],
       'Нежная мята': ['#99F6E4', '#CCFBF1'],
       'Персиковый': ['#FED7AA', '#FFEDD5'],
@@ -83,16 +93,62 @@ export default class ColorPicker implements EditorJS.InlineTool {
     this.lastRange = range;
   }
 
+
+
+  getState() {
+    type StyleProp = keyof CSSStyleDeclaration;
+
+    const findParentWithStyle = (node: HTMLElement, styleProp: StyleProp) => {
+      while (node && node !== document.body) {
+        if (node.style && node.style[styleProp]) {
+          return node.style[styleProp];
+        }
+        if (node.parentElement)
+          node = node.parentElement;
+      }
+      return null;
+    };
+
+    const anchorTag = this.api.selection.findParentTag('SPAN');
+    if (anchorTag) {
+      const color = anchorTag.style.color || findParentWithStyle(anchorTag, 'color');
+      const backgroundColor = anchorTag.style.backgroundColor || findParentWithStyle(anchorTag, 'backgroundColor');
+
+      if (color) {
+        this.selectedColor = helperFindColorNameByHexOrRGB(color, this.colors);
+      }
+      if (backgroundColor) {
+        this.selectedBackground = helperFindColorNameByHexOrRGB(backgroundColor, this.backgrounds);
+      }
+    }
+  }
+
   wrapAndColor(range: Range | null, colorHex: string, isBackground = false) {
+    // return;
     if (!range) return;
-    const selectedText = range.extractContents();
-    const span = document.createElement(this.tag);
-    span.classList.add(this.class);
-    span.appendChild(selectedText);
-    span.style[isBackground ? 'backgroundColor' : 'color'] = colorHex;
-    span.innerHTML = span.textContent || '';
-    range.insertNode(span);
-    this.api.selection.expandToTag(span);
+
+    let existingSpan = range.commonAncestorContainer.parentElement;
+    const isCurrentRange = range.toString() === existingSpan?.textContent;
+
+
+    if (existingSpan && existingSpan.classList.contains(this.class) && isCurrentRange) {
+      // Если обертка уже есть, просто обновляем нужный стиль
+      existingSpan.style[isBackground ? 'backgroundColor' : 'color'] = colorHex;
+      // Если изменился цвет, удаляем style.color или style.backgroundColor у всех дочерних элементов
+      const propertyToRemove = isBackground ? 'backgroundColor' : 'color';
+      existingSpan.querySelectorAll('*').forEach(child => {
+        (child as HTMLElement).style[propertyToRemove] = '';
+      });
+    } else {
+      const selectedText = range.extractContents();
+      const span = document.createElement(this.tag);
+      span.classList.add(this.class);
+      span.appendChild(selectedText);
+      span.style[isBackground ? 'backgroundColor' : 'color'] = colorHex;
+      range.insertNode(span);
+      // this.api.selection.expandToTag(span);
+    }
+
   }
 
   createTooltip(text: string, targetElement: HTMLElement) {
@@ -118,18 +174,18 @@ export default class ColorPicker implements EditorJS.InlineTool {
 
   createPickerSection(label: string, data: Record<string, string[]>, isBackground = false) {
     const container = document.createElement('div');
-		container.classList.add(`editorjs__colorpicker-container`);
-		container.style.gridTemplateColumns = `repeat(${this.columns}, 1fr)`;
+    container.classList.add(`editorjs__colorpicker-container`);
+    container.style.gridTemplateColumns = `repeat(${this.columns}, 1fr)`;
     container.append(this.createLabel(label));
 
-    Object.entries(data).forEach(([key, [mainColor, shadowColor]]) => {
+    Object.entries(data).forEach(([key, [hex, shadowColor]]) => {
       const div = document.createElement('div');
       div.classList.add(`editorjs__${isBackground ? 'background' : 'color'}-selector__container-item`);
-      (div.style as any)[isBackground ? 'backgroundColor' : 'color'] = mainColor;
+      (div.style as HTMLDivElement['style'])[isBackground ? 'backgroundColor' : 'color'] = hex!;
       div.innerHTML = `<div class="editorjs__${isBackground ? 'background' : 'color'}-selector__container-item--shadow" style="color: ${shadowColor}"></div>`;
       container.append(div);
 
-      div.onclick = () => this.wrapAndColor(this.lastRange, mainColor!, isBackground);
+      div.onclick = () => this.wrapAndColor(this.lastRange, hex!, isBackground);
       div.onmouseenter = () => (this.tooltip = this.createTooltip(key, div));
       div.onmouseleave = () => this.tooltip?.remove();
     });
@@ -141,21 +197,20 @@ export default class ColorPicker implements EditorJS.InlineTool {
     const container = document.createElement('div');
     container.append(this.createPickerSection('Цвет текста', this.colors));
     container.append(this.createPickerSection('Цвет фона', this.backgrounds, true));
-    
+
     return container;
   }
 
-	clear(): void {
-		this.tooltip?.remove();
-	}
+  clear(): void {
+    this.tooltip?.remove();
+  }
 
-  static get sanitize() {
+  public static get sanitize(): SanitizerConfig {
     return {
-      span: {
-        style: {
-          color: true,
-        },
-      },
-    };
+      span: {},
+      // b: true,
+      // i: true,
+      // a: true,
+    } as SanitizerConfig;
   }
 }
